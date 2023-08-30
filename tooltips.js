@@ -1,27 +1,25 @@
 // ==UserScript==
-// @name         PrUn Tooltips by Rynx
+// @name         PrUn FIO Price Tooltips
 // @namespace    http://tampermonkey.net/
-// @version      1.5
+// @version      1.7
 // @description  Adds FIO powered market tooltips to Apex console
-// @author       Manderius (Rynx), inspired by Tim Davis (binarygod, @timthedevguy)
+// @author       nanny, Manderius (Rynx), inspired by Tim Davis (binarygod, @timthedevguy)
 // @match        https://apex.prosperousuniverse.com/
 // @grant        none
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js
 // @require      https://cdn.jsdelivr.net/gh/calebjacob/tooltipster@latest/dist/js/tooltipster.bundle.min.js
-// @downloadURL  https://raw.githubusercontent.com/Manderius/PrUn_Tooltips/main/tooltips.js
-// @updateURL    https://raw.githubusercontent.com/Manderius/PrUn_Tooltips/main/tooltips.js
 // ==/UserScript==
 
 // Fix JQUERY conflicts
-this.$ = this.jQuery = jQuery.noConflict(true);
+//this.$ = this.jQuery = jQuery.noConflict(true);
 
 
-let prices = [];
-let last_update = null;
-let updates_on = null;
-let newPrices = false;
-let styles = '.tooltipster-base{display:flex;pointer-events:none;position:absolute!important;font-family:"Droid Sans",sans-serif;font-size:10px;color:#bbb}.tooltipster-box{flex:1 1 auto}.tooltipster-content{box-sizing:border-box;max-height:100%;max-width:100%;overflow:auto}.tooltipster-fade{opacity:0;-webkit-transition-property:opacity;-moz-transition-property:opacity;-o-transition-property:opacity;-ms-transition-property:opacity;transition-property:opacity}.tooltipster-fade.tooltipster-show{opacity:1}.tooltipster-sidetip .tooltipster-box{background:#222;border:1px solid #2b485a;box-shadow:0 0 5px rgba(63,162,222,.5);border-radius:0}.tooltipster-sidetip.tooltipster-right .tooltipster-box{margin-left:0}.tooltipster-sidetip .tooltipster-content{line-height:10px;padding:0}.tooltipster-sidetip .tooltipster-arrow{overflow:hidden;display:none;position:absolute}.tooltipster-content H1{border-bottom:1px solid #2b485a;background-color:rgba(63,162,222,.15);padding-bottom:8px;padding-top:9px;padding-left:10px;margin:0;font-weight:400;padding-right:10px;font-size:12px}'
-let tooltip_html = `<table class="PrUnTools_Table">
+var prices = [];
+var last_update = null;
+var updates_on = null;
+var newPrices = false;
+var styles = '.tooltipster-base{display:flex;pointer-events:none;position:absolute!important;font-family:"Droid Sans",sans-serif;font-size:10px;color:#bbb}.tooltipster-box{flex:1 1 auto}.tooltipster-content{box-sizing:border-box;max-height:100%;max-width:100%;overflow:auto}.tooltipster-fade{opacity:0;-webkit-transition-property:opacity;-moz-transition-property:opacity;-o-transition-property:opacity;-ms-transition-property:opacity;transition-property:opacity}.tooltipster-fade.tooltipster-show{opacity:1}.tooltipster-sidetip .tooltipster-box{background:#222;border:1px solid #2b485a;box-shadow:0 0 5px rgba(63,162,222,.5);border-radius:0}.tooltipster-sidetip.tooltipster-right .tooltipster-box{margin-left:0}.tooltipster-sidetip .tooltipster-content{line-height:10px;padding:0}.tooltipster-sidetip .tooltipster-arrow{overflow:hidden;display:none;position:absolute}.tooltipster-content H1{border-bottom:1px solid #2b485a;background-color:rgba(63,162,222,.15);padding-bottom:8px;padding-top:9px;padding-left:10px;margin:0;font-weight:400;padding-right:10px;font-size:12px}'
+var tooltip_html = `<table class="PrUnTools_Table">
 						<thead>
 							<tr>
 								<th></th>
@@ -115,7 +113,7 @@ function getPrices(callback) {
                 updates_on = new Date(last_update.getTime() + 5 * 60000);
 
                 newPrices = true;
-                
+
                 callback(output);
             },
             error: function (output) {
@@ -152,7 +150,7 @@ function prepareTooltips(prices, isNewPrice) {
         html = html.replaceAll('null', '--');
         // Add tooltip to box
         $('BODY').append($('<DIV />').attr('style', 'display:none;').append($('<DIV />').attr('id', `tooltip_${ticker}`).addClass('PrUn_tooltip_content')));
-        
+
         $(`#tooltip_${ticker}`).html(`<h1>TITLE-REPLACE</h1>${html}`);
     });
 }
@@ -167,7 +165,13 @@ function addTooltipToItem(item) {
 }
 
 function addTooltipsToItems() {
-    const elements = $.merge($('.T5C45pTOW9QTzokWPqLQJg\\=\\=[style*="height: 48px"] span.rjpYL1i9cZmf47fM9qWyZQ\\=\\='), $('.T5C45pTOW9QTzokWPqLQJg\\=\\=[style*="height: 33px"] span.rjpYL1i9cZmf47fM9qWyZQ\\=\\=')); 
+  	let matIconContClass = 'MaterialIcon__container___q8gKIx8';
+	let coloredIconClass = 'ColoredIcon__label___OU1I4oP';
+
+    const elements = $.merge(
+	$(`.${matIconContClass}[style*="height: 48px"] span.${coloredIconClass}`),
+			$(`.${matIconContClass}[style*="height: 33px"] span.${coloredIconClass}`)
+    );
     Array.from(elements).forEach(item => { addTooltipToItem(item) });
 }
 
@@ -206,6 +210,7 @@ function monitorOnElementCreated(selector, callback, onlyOnce = true) {
                 for (var i = 0, len = elements.length; i < len; i++) {
                     callback(elements[i]);
                     if (onlyOnce) observer.disconnect();
+                  return;
                 }
             }
         });
@@ -234,7 +239,7 @@ function waitForApexLoad() {
     const setup = () => {
         addStyle(styles);
         setupTooltips();
-        const insideFrameSelector = '.N32GL8CJBOw3-rNx0PBZkQ\\=\\=';
+        const insideFrameSelector = '.Node__horizontal___pxuyPn6.Node__node___dNd8Rux';
         monitorOnElementCreated(insideFrameSelector, () => {setTimeout(setupTooltips, 500)}, false);
     }
 

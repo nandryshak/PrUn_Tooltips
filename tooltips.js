@@ -8,6 +8,7 @@
 // @grant        none
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js
 // @require      https://cdn.jsdelivr.net/gh/calebjacob/tooltipster@latest/dist/js/tooltipster.bundle.min.js
+// @downloadURL  https://raw.githubusercontent.com/nandryshak/PrUn_Tooltips/main/tooltips.js
 // ==/UserScript==
 
 // Fix JQUERY conflicts
